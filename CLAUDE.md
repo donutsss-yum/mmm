@@ -65,6 +65,10 @@ read/write the same Drive `model_saves/` folder.
    `steps/01_fit_model.py`, `docs/CHANGELOG.md`, `docs/MODEL.md`, and the `v13` filename
    prefixes/`MODEL_VERSION` markers in steps 02 and `save_model.py`.
 9. Log every meaningful session's work in `docs/SESSION_LOG.md` (newest first).
+10. **Monthly data refresh** ("new files for the mix model"): follow `docs/INGEST.md`
+    exactly — dry-run before live, only the eight input tabs are writable, the ingest
+    writes to the LIVE sheet BigQuery reads, and the refresh isn't done until the
+    Model_Dates window + report window are rolled and the pipeline has re-run clean.
 
 ## Standard workflow
 
@@ -143,6 +147,9 @@ cost unmeasured; A100 recommended until measured). All outputs land in Drive at
 ## Where deeper docs live
 
 - `docs/SETUP.md` — one-time machine setup: CLI install, gcloud ADC scopes, first session.
+- `docs/INGEST.md` — the monthly data refresh: drop-folder → sheet append → window
+  roll → run → report. Includes the inherited incident log. (Frozen originals in
+  `legacy/abc-mmm/`.)
 - `docs/LOCAL.md` — the local backend: setup, usage, local-vs-Colab tradeoffs, Metal note.
 - `docs/WORKFLOW.md` — full (Colab) session lifecycle, recovery playbook, cost notes.
 - `docs/MODEL.md` — model card: priors + rationale, spec choices, methodology of each

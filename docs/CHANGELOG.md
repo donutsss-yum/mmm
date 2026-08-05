@@ -33,7 +33,23 @@ Known-and-accepted at v13: Google low-spend ROAS extrapolation unreliable
 - Result that motivated v13: video posteriors indistinguishable (~5.3–5.7x),
   i.e. the prior was doing all the talking.
 
-## Earlier (v10.x and before)
+## The unadopted "v14 draft" (May–June 2026, legacy/abc-mmm_betterroas/MMMv14_cell0.py)
 
-Pre-repo history; artifacts survive as HTML exports in the Drive folder
-(e.g. `ABC MMM Results March25-Feb26_v10.4.html`).
+A notebook-era draft that never shipped: Paramount roi_mu 1.20 → 1.55 ("premium
+placement" re-tier) and ALL video roi_sigma tightened 0.50 → 0.35. What actually
+happened: v13 adopted the Paramount re-tier at a compromise 1.40, and the sigma
+tightening was dropped. The 2026-08-05 v15 experiment retroactively vindicated that
+call — video posteriors are prior-driven at any aggregation, so sigma 0.35 would have
+manufactured false precision. (Note: this legacy "v14" is unrelated to the 2026-08-05
+`exp/v14-revenue-split` experiment; version numbers restarted with the git-era
+experiments.)
+
+## v10–v12 (Colab-notebook era, artifacts in legacy/)
+
+- **v10** (`legacy/abc-mmm/mmmv10.py`): vectorized priors; Celebs added as a test
+  control. Client HTML exports survive in Drive (e.g. `..._v10.4.html`).
+- **v12** (`legacy/abc-mmm_improvefit/mmmv12.py`, `legacy/abc-mmm_betterroas/MMMv12.ipynb`):
+  "the spec that works" — scenarioplanner extra added; uniform video ROI priors
+  LogNormal(1.65, 0.25); the fit-improvement work in `abc-mmm_improvefit` fed the v13
+  changes. Development outputs (spend-aligned ROAS iterations, decay profiles,
+  May 2026 summary HTML) preserved in `legacy/abc-mmm_betterroas/`.

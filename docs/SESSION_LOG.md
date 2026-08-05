@@ -3,6 +3,33 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (ingest integrated) — monthly refresh is now a first-class pipeline
+
+Ken imported his three pre-git Claude workspaces into `legacy/` (abc-mmm = the
+monthly-ingest workspace with 4 months of runbook history; betterroas = v12→v13 dev +
+an unadopted v14 draft; improvefit = v12 fit work). Integrated:
+
+- **`scripts/append_inputs_to_gsheet.py`** — the battle-tested ingest script promoted
+  from legacy (handlers verbatim; only auth [SA key → ADC fallback], paths [repo
+  `inputs/`], and pointers adapted). Appends the 5 monthly xlsx exports to the 8
+  writable tabs of the ABC MMM Inputs sheet, with shifted-row detection, multiset
+  celeb reconcile, trailing-blank repair, semantic verification.
+- **`inputs/`** — the new drop folder (committed post-ingest as provenance);
+  README with the convention.
+- **`docs/INGEST.md`** — the living runbook: golden rules + incident log inherited
+  from `legacy/abc-mmm/UPDATING_INPUTS.md` (frozen), PLUS the new steps the old
+  process never covered: roll `Model_Dates` in `sql/abc_mmm_view.sql` + apply, roll
+  step 02's report window, run pipeline, report, commit. CLAUDE.md golden rule 10
+  points at it. openpyxl added to requirements-local.
+- **CHANGELOG** enriched with v10–v12 lineage and the unadopted legacy "v14 draft"
+  (Paramount 1.55 + video sigma 0.35 — the sigma tightening was wisely dropped;
+  today's v15 experiment retroactively validated that).
+- **Open question logged in INGEST.md**: how media data (`abc.media` table) lands is
+  still not documented anywhere — ask Ken.
+
+Future state achieved: "new files for the mix model" + a folder in `inputs/` is now a
+complete instruction for any local Claude session.
+
 ## 2026-08-05 (experiments roll-up) — v14 & v15 both tested, both rejected; v13 stays
 
 Two model experiments ran end-to-end today on the local backend (~11 min each),
