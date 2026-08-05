@@ -36,6 +36,9 @@ STAGE_FILES = {
     '03':   'steps/03_roas_quarterly.py',
     '04':   'steps/04_decay_profiles.py',
     '05':   'steps/05_scenario_planner.py',
+    # exp/v14-revenue-split branch only:
+    '10':   'steps/10_exp_fit_split.py',
+    '11':   'steps/11_exp_scorecard.py',
 }
 DEFAULT_STAGES = ['00', '01', 'save', '02', '03', '04']
 

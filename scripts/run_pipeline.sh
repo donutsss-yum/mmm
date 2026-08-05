@@ -41,6 +41,8 @@ stage_file() {
     03)   echo "steps/03_roas_quarterly.py" ;;
     04)   echo "steps/04_decay_profiles.py" ;;
     05)   echo "steps/05_scenario_planner.py" ;;
+    10)   echo "steps/10_exp_fit_split.py" ;;
+    11)   echo "steps/11_exp_scorecard.py" ;;
     *)    echo "" ;;
   esac
 }
@@ -55,6 +57,8 @@ stage_timeout() {
     03)   echo 7200 ;;     # 2 counterfactuals per quarter
     04)   echo 3600 ;;     # 9 counterfactuals
     05)   echo 21600 ;;    # scenario planner: ~1.5h typical, cap at 6h
+    10)   echo 21600 ;;    # experiment: 3 fits
+    11)   echo 7200 ;;     # experiment scorecard
     *)    echo 3600 ;;
   esac
 }

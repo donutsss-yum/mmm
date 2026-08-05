@@ -3,6 +3,28 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (v14 experiment built) — exp/v14-revenue-split branch [THIS BRANCH]
+
+Ken applied the extended view to BigQuery. This branch carries the split-model
+experiment; `main` remains the production v13.
+
+- `steps/10_exp_fit_split.py`: hard gates (split columns present; weekly
+  reconciliation |total − ΣSplits| ≤ $1), then fits THREE models with the same
+  26-week holdout (`ModelSpec.holdout_id` — KPI excluded from likelihood, media
+  still drives adstock; verified against meridian v1.7.1 source):
+  T=total (v13 priors, refit so the comparison is fair), S=InStore, D=Digital
+  (Ecom+App+Vault). Sub-model priors = v13 medians × revenue share
+  (loc + ln share), sigmas widened +0.15 for allocation uncertainty.
+- `steps/11_exp_scorecard.py`: holdout R²/MAPE/wMAPE of pred(S)+pred(D) vs
+  pred(T) against actual total (posterior-mean weekly `expected_outcome`);
+  per-channel double-count check (split vs baseline incremental, flag ratios
+  outside [0.8, 1.25]); convergence gate (max r_hat < 1.05). Prints a verdict,
+  exports two stamped CSVs. Promote only if split wins holdout AND passes gates.
+- Stage maps in run_local.py / run_pipeline.sh / export_notebook.py gained
+  stages 10/11 (notebook export works for the experiment per Ken's requirement).
+- To run:  `caffeinate -i .venv/bin/python scripts/run_local.py 00 10 11`
+  (~15 min local: 3 × ~4-min fits + scorecard).
+
 ## 2026-08-05 (later still) — View SQL versioned in git + extended with revenue splits
 
 Confirmed the splits are NOT yet in the weekly view (44 cols, only total
