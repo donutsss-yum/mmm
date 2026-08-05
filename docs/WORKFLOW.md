@@ -82,6 +82,30 @@ a stale `mmm` against fresh `df_bq` mixes vintages (load_model prints this cauti
   forgetting teardown (∞).
 - `colab sessions` at the end of the day should list nothing.
 
+## Escape hatch: export a Colab-web notebook
+
+Any state of the repo (any branch, any experiment) can be exported as a classic
+notebook and run "the old fashioned way" in the Colab web UI:
+
+```bash
+.venv/bin/python scripts/export_notebook.py                # default: 00 01 save 02 03 04
+.venv/bin/python scripts/export_notebook.py --stages 05    # subset / scenario planner
+```
+
+Output lands in `notebooks/exports/` (gitignored) with the branch + commit stamped in
+the first cell. Upload via File → Upload notebook at colab.research.google.com, pick
+an A100 runtime, run top to bottom — the first cell handles pip/auth/Drive, the rest
+are verbatim copies of `steps/`. Edits made inside the exported notebook do NOT flow
+back to git; re-export after changing the repo.
+
+## Experiment branches
+
+Model experiments live on `exp/<name>` branches cut from `main`
+(e.g. `exp/v14-revenue-split`), never on `main` directly. Merge only winners —
+the scorecard (holdout comparison, convergence, attribution sanity) goes in
+`SESSION_LOG.md` either way. Every experiment can be notebook-exported for a
+Colab-web run exactly like `main`.
+
 ## Editing / development conventions
 
 - The step files ARE the model definition — the notebook in `notebooks/` is a frozen

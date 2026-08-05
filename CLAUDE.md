@@ -95,6 +95,11 @@ Useful direct commands: `colab sessions` (what's running/billing), `colab status
 `colab log -s mmm -n 20` (recent events, great for debugging), `colab log -s mmm -o run.ipynb`
 (export session history as a notebook), `colab download -s mmm /content/x ./x`.
 
+Two more conventions: **experiments** go on `exp/<name>` branches off `main` (merge only
+winners; scorecard logged in SESSION_LOG). **Notebook escape hatch**: `scripts/
+export_notebook.py` turns any branch's pipeline into a Colab-web-runnable .ipynb
+(verbatim step copies + setup cell; output gitignored under `notebooks/exports/`).
+
 ## Stage map
 
 | Stage | File | What | Typical runtime |

@@ -3,6 +3,29 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (late night) — Revenue-split experiment scoped; notebook exporter added
+
+Ken proposed splitting the model by revenue stream and summing outputs. Scouting
+findings (from the "ABC MMM Inputs" sheet, read via Drive):
+
+- The split EXISTS as daily columns in the Inputs sheet: `Rev_All / Rev_InStore /
+  Rev_Ecom / Rev_App / Rev_Vault` (+ Trans_*/Units_* each), daily from 2023-01-01.
+- **Proportions matter**: InStore ≈ 95–98% of revenue; App and Vault are structurally
+  ZERO until their launches (App well into the history; Vault ~Aug 2024). A 4-model
+  split is therefore ill-posed (tiny/partial KPIs fitting 9 channels; Vault revenue is
+  drop-driven — Vault_Drops is already a model treatment). **Agreed direction: start
+  2-way — InStore vs Digital (Ecom+App+Vault)** — as `exp/v14-revenue-split`, scored
+  on a ~26-week holdout of summed predictions vs the single-model baseline, plus a
+  double-counting check (summed channel attribution vs baseline's).
+- Open item before building: confirm whether weekly split columns already exist in
+  the `abc.mmm` view (`SELECT * LIMIT 1` and eyeball columns) or whether the view
+  needs extending from the daily raw tab.
+- NEW TOOLING: `scripts/export_notebook.py` — exports any branch's pipeline as a
+  Colab-web-runnable .ipynb (provenance markdown cell + setup cell with
+  pip/auth/drive.mount + verbatim step cells; nbformat-validated). Ken's requirement:
+  every experiment must be runnable "the old fashioned way". Output gitignored under
+  notebooks/exports/. Conventions documented in WORKFLOW.md (+ `exp/` branch rule).
+
 ## 2026-08-05 (night) — FIRST END-TO-END RUN: local backend, full success
 
 `caffeinate -i .venv/bin/python scripts/run_local.py` on Ken's MBP (Apple silicon,

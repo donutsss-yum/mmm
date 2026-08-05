@@ -7,6 +7,9 @@ __pycache__/
 # Notebook execution artifacts (colab exec -f x.ipynb writes x_output.ipynb)
 *_output.ipynb
 
+# Generated notebook exports (scripts/export_notebook.py) - steps/ is the source of truth
+notebooks/exports/
+
 # Local scratch / downloaded artifacts (canonical outputs live in Google Drive: My Drive/ABC/MMM)
 outputs/
 *.pkl
