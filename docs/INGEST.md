@@ -136,6 +136,7 @@ plus fit sanity (r_hat, shape) and links/paths to outputs. One line per anomaly.
 | May 2026 | ~5/30–5/31/2026 | No Store Event Data file |
 | Jun 2026 | 6/29–6/30/2026 | Applejack skipped; email shift incident + fix; celebs reconciled |
 | — | — | *(migrated to git-native pipeline 2026-08-05; next round starts here)* |
+| **Jul 2026 — IN PROGRESS** | ~8/1–8/3 (ecom only 7/6!) | Folder `inputs/reupdateddatathrough81`. Dry run reviewed+approved 2026-08-05 (cloud session): storecount 33, lightning 34, celebs 0 (clean reconcile), email 38, rev_store 33, rev_ecom repair 6/30 + 6 rows, rev_app 34, rev_vault repair 6/30 ($258k!) + 31 rows. **Next: run LIVE, confirm verification CLEAN, then update this row.** Open flags: (1) rev_ecom source blank after 7/6 — export lag? model window must not pass 7/6 until resolved; (2) `Vault Day.xlsx` skipped as unrecognized — awaiting Ken's ruling; (3) Google Trends not yet updated — refresh stops after ingest; (4) cosmetic: email dry-run "span" prints Budget not dates. |
 
 ## The media side (automatic — no ingest step)
 
