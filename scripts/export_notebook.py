@@ -36,6 +36,9 @@ STAGE_FILES = {
     '03':   'steps/03_roas_quarterly.py',
     '04':   'steps/04_decay_profiles.py',
     '05':   'steps/05_scenario_planner.py',
+    # exp/v15-channel-consolidation branch only:
+    '12':   'steps/12_exp_fit_consolidated.py',
+    '13':   'steps/13_exp_scorecard_consolidated.py',
 }
 DEFAULT_STAGES = ['00', '01', 'save', '02', '03', '04']
 

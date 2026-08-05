@@ -3,6 +3,32 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (v15 experiment built) — exp/v15-channel-consolidation [THIS BRANCH]
+
+Ken's idea after v14's post-mortem: consolidate channels — **Search+PMAX, Social
+(Meta), Video (all 5 partners), Amex dropped** (his grouping choice, 9 → 3 channels).
+Motivation: v13's per-partner video posteriors are documented prior-creatures (v12
+uniform-prior collapse; near-identical decay profiles); one Video channel should be
+data-identified. Context: the v14 revenue-split experiment was NOT promoted
+(double-count gate failure — see the exp/v14-revenue-split branch log); this is a
+cleaner test — single model vs single model, no double-counting possible.
+
+- `steps/12_exp_fit_consolidated.py`: builds combined columns (Video sums the 5
+  partner columns, NOT the view's Video_* aggregate which includes Peacock;
+  Search_PMAX uses IMPRESSIONS for both parts — deliberate deviation from v13's
+  clicks-for-Search), spend-weighted blended priors, fits baseline (v13 refit) +
+  consolidated with the shared 26-week holdout.
+- `steps/13_exp_scorecard_consolidated.py`: holdout accuracy, grouped attribution
+  parity (incl. where Amex's ~$2.1M re-homes), ROI posterior-width comparison
+  (the interpretability headline), convergence gate, verdict + 3 CSVs.
+- Stage maps: 12/13 added to run_local / run_pipeline / export_notebook.
+- Run: `caffeinate -i .venv/bin/python scripts/run_local.py 00 12 13` (~10 min).
+
+Decision rule: prefer consolidated if holdout ≥ baseline AND grouped attribution
+sane AND Video_All CI meaningfully tighter than per-partner CIs. Watch-outs named
+in advance: Amex's revenue re-homing inflating survivors; Search response degrading
+from the clicks→impressions switch.
+
 ## 2026-08-05 (later still) — View SQL versioned in git + extended with revenue splits
 
 Confirmed the splits are NOT yet in the weekly view (44 cols, only total
