@@ -123,7 +123,11 @@ cost unmeasured; A100 recommended until measured). All outputs land in Drive at
 ## Key facts
 
 - BigQuery source: project `donut-426`, view `abc.mmm`, filter `Model_Dates = 'In Model'`.
-  Weekly, national (single geo). KPI: `Conversions_Revenue` (dollars).
+  Weekly, national (single geo, labeled `FL`). KPI: `Conversions_Revenue` (dollars).
+  **The view's definition is versioned at `sql/abc_mmm_view.sql`** — edit there first,
+  commit, then apply to BigQuery (paste into console or `bq query`). The view unions
+  9 sheet-backed sources; UNION ALL is positional, so new columns go into ALL blocks.
+  The `Model_Dates` window end-date lives in that SQL and rolls forward on refresh.
   **The view reads a Google-Sheets-backed external table** ("ABC MMM Inputs"), so every
   query needs Drive-scoped credentials — `Permission denied while getting Drive
   credentials` means the ADC scope set is wrong (fix: docs/SETUP.md § 3).

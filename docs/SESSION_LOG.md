@@ -3,6 +3,30 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (later still) — View SQL versioned in git + extended with revenue splits
+
+Confirmed the splits are NOT yet in the weekly view (44 cols, only total
+`Conversions_Revenue`), then pulled the full view definition. Structure: 9-block
+UNION ALL blender (media, revenue via `abc.gSheet_rev`, vault drops, gtrends, email,
+lightning, storecount, celebs, promos) → weekly GROUP BY. `abc.gSheet_rev` is the
+Sheets-backed table over the daily revenue tab, so the split columns were already
+reachable — the view just never selected them.
+
+- **`sql/abc_mmm_view.sql` is now the versioned source of truth** for the view
+  (CREATE OR REPLACE VIEW; previously BigQuery-only). Change process: edit in git →
+  commit → apply to BQ.
+- Added `Conversions_Revenue_InStore / _Ecom / _App / _Vault` (weekly sums; NULL
+  placeholders in all 9 union blocks since UNION ALL is positional). Non-breaking
+  for v13 (columns selected by name).
+- Apply gates: (1) pre-check that `abc.gSheet_rev` exposes Rev_InStore/Ecom/App/Vault
+  to BQ (external-table schema may lag the sheet); (2) post-apply reconciliation —
+  the four splits must sum to Conversions_Revenue every in-model week. Queries in
+  the 2026-08-05 chat / re-derivable trivially.
+- Side facts recorded: geo constant is `'FL'`; view carries unused-by-model columns
+  (Video_Peacock_*, Email_spend, Video_* aggregates); `Model_Dates` in-model window
+  is 2023-01-01 → 2026-06-27, rolled forward manually on refresh (Ken's comment
+  preserved in the SQL).
+
 ## 2026-08-05 (late night) — Revenue-split experiment scoped; notebook exporter added
 
 Ken proposed splitting the model by revenue stream and summing outputs. Scouting
