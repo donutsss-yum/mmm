@@ -1,0 +1,14 @@
+# Dependencies installed ON THE COLAB VM, once per session, via:
+#   colab install -s <session> -r requirements-colab.txt
+# (scripts/provision.sh does this for you)
+#
+# This mirrors the notebook's original pip line exactly:
+#   pip install --upgrade google-meridian[colab,scenarioplanner,and-cuda]
+# - colab extra:           Colab-friendly pins
+# - scenarioplanner extra: the scenario planner / Sheets exporter used in step 05
+# - and-cuda extra:        CUDA-enabled TensorFlow so sampling actually uses the GPU
+google-meridian[colab,scenarioplanner,and-cuda]
+
+# Preinstalled on Colab runtimes but pinned here so a bare/changed image still works:
+pandas-gbq   # BigQuery pull in steps 01 / load_model
+gspread      # dashboard sheet upload fallback in step 05

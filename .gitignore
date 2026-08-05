@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Notebook execution artifacts (colab exec -f x.ipynb writes x_output.ipynb)
+*_output.ipynb
+
+# Local scratch / downloaded artifacts (canonical outputs live in Google Drive: My Drive/ABC/MMM)
+outputs/
+*.pkl
+
+# OS noise
+.DS_Store
