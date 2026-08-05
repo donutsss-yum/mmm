@@ -25,10 +25,12 @@ this is a small national-level model (~174 weeks); it's sampler *speed* that dif
 ./scripts/setup_local.sh     # .venv (Python 3.12 via uv) + Meridian CPU stack
 ```
 
-Plus Google auth once per machine — the gcloud ADC command in [SETUP.md](SETUP.md) § 3
-covers BigQuery and the Colab CLI (local file outputs need no Drive scope at all).
-The one exception is a *local* stage-05 run (Sheets upload) — see SETUP.md § 3 for why
-the Drive/Sheets scopes get blocked and the two ways around it.
+Plus Google auth once per machine — SETUP.md § 3, which has TWO required sub-steps:
+trust the gcloud OAuth client in the Workspace admin console (3a), then mint ADC with
+the full scope list (3b). The Drive scope in that list is load-bearing for every run:
+the `abc.mmm` BigQuery view reads a Sheets-backed table, and querying it without
+Drive-scoped credentials fails with `Permission denied while getting Drive
+credentials`.
 
 ## Running
 
@@ -57,10 +59,10 @@ locally is CPU-allowed via `MMM_ALLOW_CPU=1`).
 2. TF on CPU may print AVX/oneDNN info lines — noise, ignore.
 3. `pandas_gbq` may warn about no quota project with user ADC — harmless (we pass
    `project_id` explicitly).
-4. If step 01 dies with an auth error, re-mint ADC with the scope list in
-   SETUP.md § 3 — a plain `gcloud auth application-default login` mints the wrong
-   scope set. (Steps 00–04 need no Drive/Sheets scopes; only a local stage-05 run
-   does — see SETUP.md § 3.)
+4. If step 01 dies with an auth error — especially `Permission denied while getting
+   Drive credentials` — redo SETUP.md § 3 in full: the Workspace allow-list (3a) must
+   be in place, and ADC must be minted with the complete scope list (3b), Drive scope
+   included. A plain `gcloud auth application-default login` is never enough.
 
 ## Apple GPU (tensorflow-metal) — experimental, off by default
 

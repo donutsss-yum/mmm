@@ -117,6 +117,9 @@ run — record it in `docs/SESSION_LOG.md`). All outputs land in Drive at
 
 - BigQuery source: project `donut-426`, view `abc.mmm`, filter `Model_Dates = 'In Model'`.
   Weekly, national (single geo). KPI: `Conversions_Revenue` (dollars).
+  **The view reads a Google-Sheets-backed external table** ("ABC MMM Inputs"), so every
+  query needs Drive-scoped credentials — `Permission denied while getting Drive
+  credentials` means the ADC scope set is wrong (fix: docs/SETUP.md § 3).
 - 9 paid channels: Meta, Search, PMAX, Amex + 5 video partners (Epsilon, Google, Hulu,
   MNTN, Paramount). **Search uses clicks; all others impressions.**
 - Report window in step 02: `start_date, end_date = '2025-06-29', '2026-06-21'` — must span

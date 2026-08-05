@@ -105,17 +105,31 @@ else:
            "Check Google Drive desktop sync is running and the ABC/MMM folder exists, "
            "or set MMM_OUT_DIR to an alternative output folder.")
 
-# 6) BigQuery reachable (source data lives in donut-426.abc.mmm)
+# 6) BigQuery reachable AND the actual source view queryable. The probe hits abc.mmm
+#    itself (not SELECT 1) because the view reads a Google-Sheets-backed external
+#    table: querying it requires DRIVE-scoped credentials, which a plain reachability
+#    check would not exercise (learned the hard way on first local run, 2026-08-05).
 _bq_ok = False
+_bq_err = ""
 if _creds_ok:
     try:
         import pandas_gbq
-        pandas_gbq.read_gbq("SELECT 1 AS ok", project_id="donut-426", progress_bar_type=None)
+        pandas_gbq.read_gbq(
+            "SELECT time FROM abc.mmm WHERE Model_Dates = 'In Model' LIMIT 1",
+            project_id="donut-426", progress_bar_type=None)
         _bq_ok = True
     except Exception as e:
+        _bq_err = str(e)
         print(f"       ({type(e).__name__}: {e})")
-_check("BigQuery reachable (project donut-426)", _bq_ok,
-       f"Usually a credentials/scope problem - fix: {_fix_auth}")
+if not _bq_ok and 'Drive credentials' in _bq_err:
+    _bq_fix = ("Your credentials lack the Drive scope that BigQuery needs to read the "
+               "Sheets-backed table behind abc.mmm. See docs/SETUP.md section 3: trust the "
+               "gcloud OAuth client in the Workspace admin console, then re-run the ADC "
+               "login WITH the drive scope." if not IS_COLAB else
+               "Re-run `colab auth -s <session>` - the VM's credentials lack Drive access.")
+else:
+    _bq_fix = f"Usually a credentials/scope problem - fix: {_fix_auth}"
+_check("BigQuery source view queryable (donut-426, abc.mmm)", _bq_ok, _bq_fix)
 
 # 7) Output dir writable
 _out_ok = False

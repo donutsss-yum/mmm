@@ -3,17 +3,23 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
-## 2026-08-05 (evening) — First machine setup; ADC scope reality check
+## 2026-08-05 (evening) — First machine setup; ADC scope reality, in two acts
 
-Ken began first local setup on his MBP. Two field findings folded into docs:
+Ken began first local setup on his MBP. Field findings folded into docs:
 
-- Google **blocked** the ADC login when it included the `drive` + `spreadsheets`
-  scopes ("This app is blocked" — Workspace restricts sensitive scopes for
-  unconfigured apps). Resolution: the standard login now uses only the 4 Colab/BQ
-  scopes (steps 00–04 need nothing more; local outputs are plain files in the synced
-  Drive folder). Local stage-05 (Sheets upload) options documented in SETUP.md § 3:
-  run 05 on Colab (recommended), or allow-list the gcloud OAuth client in the
-  Workspace admin console.
+- **Act 1**: Google **blocked** the ADC login when it included `drive` +
+  `spreadsheets` ("This app is blocked" — Workspace restricts sensitive scopes for
+  unconfigured apps). We initially dropped those scopes, reasoning steps 00–04 didn't
+  need them (local outputs are plain files in the synced Drive folder).
+- **Act 2 — wrong**: first real run failed in step 01: BigQuery returned
+  `403 ... Permission denied while getting Drive credentials`. **The `abc.mmm` view
+  reads a Google-Sheets-backed external table** (the "ABC MMM Inputs" sheet), so
+  EVERY query against it needs Drive-scoped credentials. Colab never surfaced this
+  because `colab auth` grants Drive access. Consequence: the Workspace allow-list of
+  the gcloud OAuth client is **mandatory setup** (SETUP.md § 3a), followed by the
+  full 6-scope ADC login (§ 3b). Silver lining: stage 05 locally is unlocked by the
+  same fix. Preflight (step 00) now probes `abc.mmm` itself instead of `SELECT 1`,
+  with a targeted remediation message for the Drive-credentials failure.
 - Also: `main` now exists and should be the default branch (repo started empty, so
   the migration branch was the only/default branch and PR creation failed with
   "resource not found" — no base branch. Ken chose promote-to-main over a PR).

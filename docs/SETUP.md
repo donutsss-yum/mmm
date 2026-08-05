@@ -36,42 +36,47 @@ brew install google-cloud-sdk        # macOS
 
 ## 3. Authenticate with Google (Application Default Credentials)
 
-A plain `gcloud auth application-default login` is NOT enough — mint ADC with this
-scope list (it covers the Colab CLI's backends AND local runs of steps 00–04;
-BigQuery rides on `cloud-platform`):
+**The Drive scope is NOT optional here.** The `abc.mmm` BigQuery view reads a
+Google-Sheets-backed external table (the "ABC MMM Inputs" sheet), so *any* query
+against it — i.e. the core pipeline, not just step 05 — needs Drive-scoped
+credentials. BigQuery fails with `Permission denied while getting Drive credentials`
+otherwise (hit on first local run, 2026-08-05). On Colab this is invisible because
+`colab auth` always grants Drive access.
+
+Because `drive` is a sensitive scope, Workspace **blocks** the login ("This app is
+blocked") until the gcloud OAuth client is trusted. So setup is two sub-steps:
+
+### 3a. Trust the gcloud app in Workspace admin (once, needs the donutanalytics.com admin)
+
+admin.google.com → **Security → Access and data control → API controls →
+Manage third-party app access** → **Configure new app** → search by OAuth client ID:
+
+```
+764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com
+```
+
+→ select "Google Cloud SDK" → apply to everyone → **Trusted**. Allow a few minutes
+to propagate.
+
+### 3b. Mint ADC with the full scope list
+
+A plain `gcloud auth application-default login` is NOT enough:
 
 ```bash
 gcloud auth application-default login \
   --scopes=openid,\
 https://www.googleapis.com/auth/cloud-platform,\
 https://www.googleapis.com/auth/userinfo.email,\
-https://www.googleapis.com/auth/colaboratory
+https://www.googleapis.com/auth/colaboratory,\
+https://www.googleapis.com/auth/drive,\
+https://www.googleapis.com/auth/spreadsheets
 ```
 
 Why each scope: `userinfo.email` (Colab session backend, else 401), `colaboratory`
 (Colab keep-alive RPC, else 403 and the CLI un-assigns fresh VMs), `openid` +
-`cloud-platform` (gcloud refuses scope lists without them; `cloud-platform` also covers
-BigQuery).
-
-Local file outputs need NO Drive scope — they write to the desktop-synced Drive
-folder as plain files.
-
-### Stage 05 locally needs Drive + Sheets scopes (blocked by default)
-
-The one thing the scopes above do NOT cover is a **local** run of step 05 (gspread
-upload to the dashboard spreadsheet). Adding
-`https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/spreadsheets`
-to the login triggers **"This app is blocked"** — Workspace blocks unconfigured apps
-from sensitive scopes (verified 2026-08-05 on ken@donutanalytics.com). Options:
-
-1. **Run stage 05 on Colab instead** (zero setup — `colab auth` on the VM grants
-   Sheets access through Colab's own flow, exactly like the notebook always did).
-   Recommended anyway: 05 is the slowest stage and wants the A100.
-2. **Allow-list gcloud in Workspace admin** (durable fix, ~5 min, needs the
-   donutanalytics.com admin): admin.google.com → Security → Access and data control →
-   API controls → Manage third-party app access → add "Google Cloud SDK" (OAuth
-   client ID `764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com`)
-   as **Trusted**. Then re-run the login above with the two extra scopes appended.
+`cloud-platform` (gcloud refuses scope lists without them; `cloud-platform` also
+covers BigQuery's API), `drive` (BigQuery's Sheets-backed source table — required
+by every pipeline run), `spreadsheets` (step 05's dashboard upload via gspread).
 
 **Verify:**
 
