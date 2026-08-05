@@ -1,8 +1,14 @@
 # @title Step 03 - Spend-aligned ROAS by quarter + non-media driver attribution
 # =============================================================================
 # MIGRATION NOTE: this is cell 2 of MMMv13_2.ipynb, unchanged except for this
-# header and an upfront kernel-state check. Outputs: printed pivot tables
-# (streamed to your terminal) + a timestamped CSV in the Drive folder.
+# header, an upfront kernel-state check, and ONE documentation/config repair:
+# the notebook's comment + non_media_agg named Celebs as a non-media treatment,
+# but the model's non_media_cols are actually [Vault_Drops, Email_sends,
+# Redemptions_Other, StoreCount] (Celebs is a CONTROL - see step 01). The dead
+# 'Celebs' agg entry is now 'Redemptions_Other': 'sum' - numerically identical
+# to before (Redemptions_Other already fell back to 'sum'), the config just
+# tells the truth now. Outputs: printed pivot tables (streamed to your
+# terminal) + a timestamped CSV in the Drive folder.
 #
 # REQUIRES kernel state from step 01 (mmm, df_bq, media_channels,
 # media_impression_cols, media_spend_cols, non_media_cols, out_dir).
@@ -19,10 +25,11 @@
 # realized-period ROAS side-by-side so you can see the distortion the pull-back removes.
 #
 # ALSO IN THIS VERSION: per-quarter incremental revenue attributed to non-media TREATMENTS (Vault_Drops,
-# Email_sends, StoreCount, Celebs) alongside their input values. Non-media treatments enter the model
-# linearly with no adstock, so realized = aligned (no lag to pull back).
+# Email_sends, Redemptions_Other, StoreCount) alongside their input values. Non-media treatments enter the
+# model linearly with no adstock, so realized = aligned (no lag to pull back).
 #
-# NOT INCLUDED: model CONTROLS (Hurricanes, Category_Interest, LightningSales, Redemptions_*). Meridian's
+# NOT INCLUDED: model CONTROLS (Hurricanes, Category_Interest, LightningSales,
+# Redemptions_Birthday_Signup, Celebs). Meridian's
 # analyzer doesn't decompose them through incremental_outcome - they're absorbed into the model fit but
 # aren't separately attributable here. (Possible future extension: manually compute gamma_c * X_c per
 # quarter from the posterior.)
@@ -51,11 +58,10 @@ WRITE_CSV = True
 # Aggregation per non-media treatment for the per-quarter input value. Events/sends use sum; state-like
 # vars (StoreCount) use mean. Falls back to 'sum' for any variable added without an explicit choice.
 non_media_agg = {
-    'Vault_Drops': 'sum',
-    'Email_sends': 'sum',
-    'StoreCount':  'mean',
-    'Celebs':      'sum'
-
+    'Vault_Drops':       'sum',
+    'Email_sends':       'sum',
+    'Redemptions_Other': 'sum',
+    'StoreCount':        'mean',
 }
 
 analyzer = analyzer_module.Analyzer(mmm)

@@ -26,7 +26,7 @@ cd "$(dirname "$0")/.."
 if ! command -v colab >/dev/null 2>&1; then
   echo "ERROR: 'colab' CLI not found on PATH."
   echo "Install it with:  uv tool install google-colab-cli"
-  echo "Then authenticate per docs/SETUP.md (gcloud ADC with the 4 required scopes)."
+  echo "Then authenticate per docs/SETUP.md section 3 (gcloud ADC with the required scopes)."
   exit 1
 fi
 

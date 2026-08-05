@@ -2,7 +2,8 @@
 
 One-time machine setup is in [SETUP.md](SETUP.md). This page is the operating manual for
 a **Colab** working session; for the local backend (no VM, no billing, CPU fit) see
-[LOCAL.md](LOCAL.md). The stage table (files, runtimes, timeouts) lives in `CLAUDE.md`.
+[LOCAL.md](LOCAL.md). The stage table (files, runtimes) lives in `CLAUDE.md`; per-stage
+exec timeouts live in `scripts/run_pipeline.sh`.
 
 ## Mental model
 
@@ -61,7 +62,7 @@ colab download -s mmm /content/some_file ./some_file
 | Symptom | Diagnosis | Fix |
 |---|---|---|
 | Step fails: `Missing kernel globals: ['mmm', ...]` | Kernel restarted or fit never ran | `./scripts/run_pipeline.sh load` (restores newest save) or re-run `01` |
-| `No Google credentials on the VM` | `colab auth` not done for this VM | Human runs `colab auth -s mmm` |
+| `No Google credentials available` | `colab auth` not done for this VM | Human runs `colab auth -s mmm` |
 | Outputs error: `/content/drive/... not found` | Drive not mounted on this VM | Human runs `colab drivemount -s mmm` |
 | `ImportError: meridian` | New/reset VM without deps | `colab install -s mmm -r requirements-colab.txt` |
 | `Session not found` / 404 / 401 on exec | Backend reclaimed the VM (24 h cap, etc.) | `colab sessions`, then `./scripts/provision.sh` and `load` |

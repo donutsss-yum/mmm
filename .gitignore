@@ -10,6 +10,7 @@ __pycache__/
 # Local scratch / downloaded artifacts (canonical outputs live in Google Drive: My Drive/ABC/MMM)
 outputs/
 *.pkl
+*.binpb
 
 # OS noise
 .DS_Store

@@ -201,8 +201,9 @@ if WRITE_CSV:
     print(f"\nSaved:\n  {p1}\n  {p2}")
 
 if WITH_PLOT:
-    import matplotlib
-    matplotlib.use('Agg')  # headless: save, don't show
+    # No global backend switch here: fig.savefig works under any backend, and forcing
+    # Agg kernel-wide would silently break inline rendering for anyone re-attaching
+    # to the kernel interactively (step 02 does switch it and documents that).
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharex=True)
     for ch in paid_channels:

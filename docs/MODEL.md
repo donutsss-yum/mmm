@@ -125,7 +125,7 @@ Reading LogNormal ROI priors: median ROAS = `exp(loc)`; mean = `exp(loc + σ²/2
 | `roas_by_quarter_spend_aligned_<stamp>.csv` | step 03 |
 | `decay_profile_by_channel_<stamp>.csv`, `decay_summary_by_channel_<stamp>.csv` | step 04 |
 | `decay_profile_plot_<stamp>.png` | step 04 (new in CLI migration) |
-| `model_saves/mmm_v13_<stamp>.pkl` | save_model (new in CLI migration) |
+| `model_saves/mmm_v13_<stamp>.binpb` (`.pkl` from older Meridian builds) | save_model (new in CLI migration) |
 | dashboard spreadsheet worksheets | step 05 |
 
 Historical v10/v12 HTML files in the same folder predate this repo.

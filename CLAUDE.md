@@ -145,7 +145,7 @@ run — record it in `docs/SESSION_LOG.md`). All outputs land in Drive at
   speed / stage 05.
 - **2026-08-05**: Repo created by migrating `MMMv13_2.ipynb` (Colab web UI) to this
   CLI-driven structure. Code is semantically 1:1 with the notebook (see MIGRATION NOTE
-  headers in each step). **Not yet executed end-to-end in either backend** — first
+  headers in each migrated step, 01–05; steps 00/save/load are new). **Not yet executed end-to-end in either backend** — first
   real run pending Ken's one-time setup (docs/SETUP.md; for local also
   `./scripts/setup_local.sh`). Expect first-run wrinkles in step 02 chart saving
   (Altair `.save()`), ADC scope coverage for gspread in step 05, and unknown local

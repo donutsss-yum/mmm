@@ -3,6 +3,32 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (later still) — Adversarial verification pass applied
+
+Ran an 8-auditor verification workflow (cell-by-cell notebook parity, real-CLI flag
+audit, macOS bash 3.2 portability, docs-vs-code consistency, new-API checks against
+upstream Meridian). 13 findings, all fixed:
+
+- **Notebook bug surfaced (worth knowing):** cell 2's comment and `non_media_agg`
+  named `Celebs` as a non-media treatment, but the model's treatments are
+  `[Vault_Drops, Email_sends, Redemptions_Other, StoreCount]` (`Celebs` is a control).
+  The `'Celebs'` agg entry was dead code and `Redemptions_Other` silently fell back to
+  'sum'. Step 03 now states the true lists and aggregates `Redemptions_Other: 'sum'`
+  explicitly — numerically identical results, honest config. This bug exists in the
+  archived notebook too (left as-is there; it's a frozen copy).
+- `save_mmm`/`load_mmm` are **deprecated** in Meridian v1.7.1 → save/load now prefer
+  `meridian.schema.serde.meridian_serde.save_meridian`/`load_meridian` (protobuf
+  `.binpb`, cross-version safe) with pickle fallback for older builds; loader accepts
+  both formats.
+- load_model now *prints* the stale-fit-vs-fresh-data caution (was comment-only).
+- Step 04 no longer flips the kernel-wide matplotlib backend (fig.savefig doesn't
+  need it); step 02 still does and now documents the side effect.
+- Step 05: globals check extended to df_bq/media_channels/media_spend_cols (used on
+  the gspread path); runtime-estimate strings harmonized (~1.5 h A100) and documented.
+- Doc drift from the local-backend edits corrected (preflight success string, scope
+  count, error-message strings, timeout-table pointer, MIGRATION NOTE claims,
+  `.binpb` in output table); `setup_local.sh` executable bit committed.
+
 ## 2026-08-05 (later) — Local execution backend added
 
 Ken: "not even sure we need Colab — my MBP has a shit ton of RAM — set up the code to
@@ -32,8 +58,9 @@ unreliable for MCMC; try only against a verified CPU baseline).
 **Done:**
 
 - Created this repo from `MMMv13_2.ipynb` (the v13 model, previously run by pasting
-  cells into the Colab web UI). The 5 notebook cells became `steps/00–05` plus
-  `save_model.py` / `load_model.py`; every step carries a MIGRATION NOTE header
+  cells into the Colab web UI). The 5 notebook cells became `steps/01–05`; steps
+  `00_check_runtime.py`, `save_model.py`, and `load_model.py` are new additions with
+  no notebook source. Each migrated step (01–05) carries a MIGRATION NOTE header
   documenting exactly what changed vs. its source cell.
 - Deliberate changes vs. the notebook (everything else is 1:1):
   - `!pip install` → `requirements-colab.txt` + `colab install` (provision.sh).

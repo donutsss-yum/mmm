@@ -87,7 +87,7 @@ preflight (`./scripts/run_pipeline.sh 00`) tells you exactly which one is missin
 Then:
 
 ```bash
-./scripts/run_pipeline.sh 00     # preflight — expect ALL PREFLIGHT CHECKS PASSED
+./scripts/run_pipeline.sh 00     # preflight — expect PREFLIGHT OK
 ./scripts/run_pipeline.sh        # full run: fit + save + diagnostics + ROAS + decay
 ./scripts/teardown.sh            # when done for the day
 ```

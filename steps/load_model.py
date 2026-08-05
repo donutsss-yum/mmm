@@ -91,19 +91,31 @@ control_cols = ['Category_Interest', 'Hurricanes', 'LightningSales', 'Redemption
 print("Data pulled. Shape:", df_bq.shape)
 
 # --- 3) load the fitted model ------------------------------------------------
-from meridian.model import model as mmm_module
-
 if LOAD_PATH is None:
-    _saves = sorted(glob.glob(os.path.join(out_dir, 'model_saves', 'mmm_*.pkl')))
+    _saves = sorted(
+        glob.glob(os.path.join(out_dir, 'model_saves', 'mmm_*.binpb'))
+        + glob.glob(os.path.join(out_dir, 'model_saves', 'mmm_*.pkl'))
+    )
     if not _saves:
         raise RuntimeError(
             f"No saved models found in {out_dir}/model_saves/. "
             f"Run steps/01_fit_model.py then steps/save_model.py first."
         )
-    LOAD_PATH = _saves[-1]  # timestamped names sort chronologically
+    # names embed a sortable timestamp (mmm_vNN_YYYYMMDD_HHMMSS.*) -> newest is last
+    LOAD_PATH = max(_saves, key=os.path.basename)
 
 print(f"Loading model from {LOAD_PATH} ...")
-mmm = mmm_module.load_mmm(LOAD_PATH)
+if LOAD_PATH.endswith(('.binpb', '.txtpb', '.textproto')):
+    from meridian.schema.serde import meridian_serde
+    mmm = meridian_serde.load_meridian(LOAD_PATH)
+else:  # legacy pickle save (deprecated upstream; version-fragile)
+    from meridian.model import model as mmm_module
+    mmm = mmm_module.load_mmm(LOAD_PATH)
+
+print(f"CAUTION: this fit reflects the data as of its save stamp "
+      f"({os.path.basename(LOAD_PATH)}); df_bq was just re-pulled fresh "
+      f"(latest week: {df_bq['time'].max().date()}). If BigQuery gained new weeks "
+      f"since the save, re-fit via step 01 instead of mixing vintages.")
 print("Model restored. Kernel globals now set: mmm, df_bq, credentials, media_channels, "
       "media_impression_cols, media_spend_cols, non_media_cols, control_cols, out_dir.")
 print("Steps 02-05 can now run without a re-fit.")

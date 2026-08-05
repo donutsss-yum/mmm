@@ -6,6 +6,9 @@
 #      inside the kernel).
 #   2. The final Looker Studio link renders as a printed URL instead of an
 #      inline HTML widget.
+#   3. Runtime-estimate strings harmonized: the notebook's cell body printed
+#      "~45 min on h1100" while its own @title said "1.5rhrs ... on A100" -
+#      messages now consistently say ~1.5 h on A100.
 # Everything else - specs, constraints, sheet-targeting logic, augmentation
 # tabs - is unchanged.
 #
@@ -13,8 +16,8 @@
 # *** spreadsheet (TARGET_SPREADSHEET_ID below) that Looker Studio reads.
 # *** Only run it deliberately - it is NOT part of the default pipeline run.
 #
-# REQUIRES kernel state from step 01 (mmm, credentials, media_channels,
-# media_spend_cols, df_bq, out_dir).
+# REQUIRES kernel state from step 01 (mmm, credentials, df_bq, media_channels,
+# media_spend_cols).
 # Run via:  colab exec -s <session> -f steps/05_scenario_planner.py --timeout 21600
 # =============================================================================
 
@@ -32,12 +35,14 @@ except ImportError as _e:
         f"colab install -s <session> -r requirements-colab.txt   then re-run this step."
     )
 
-_missing = [n for n in ('mmm', 'credentials') if n not in globals()]
+_missing = [n for n in ('mmm', 'credentials', 'df_bq', 'media_channels', 'media_spend_cols')
+            if n not in globals()]
 if _missing:
     raise RuntimeError(
         f"Missing required variable(s) from step 01: {_missing}. Re-run steps/01_fit_model.py "
         f"first - it fits the model and leaves it in scope as `mmm`. Runtime resets wipe in-memory "
-        f"state, so the full sampling step has to be redone (or restored via steps/load_model.py)."
+        f"state, so the full sampling step (~8 min on A100, longer on CPU) has to be redone - "
+        f"or restore a saved fit in ~2 min via steps/load_model.py."
     )
 
 import inspect

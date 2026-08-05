@@ -9,6 +9,9 @@
 # The numeric convergence summary (az.summary) still prints to stdout, which
 # `colab exec` streams back to your terminal - eyeball r_hat (< 1.05) and
 # ess_bulk there, then open the saved charts for anything suspicious.
+# NOTE: this step forces matplotlib's Agg backend KERNEL-WIDE (deliberate for
+# headless exec). Side effect: if you later attach the Colab web UI to this
+# kernel, inline matplotlib rendering stays off until a kernel restart.
 #
 # The main deliverable is unchanged: Meridian's two-page HTML results summary,
 # written to the Drive folder with the same filename pattern as always.
