@@ -36,24 +36,42 @@ brew install google-cloud-sdk        # macOS
 
 ## 3. Authenticate with Google (Application Default Credentials)
 
-One ADC login serves everything: the Colab CLI's backends AND local pipeline runs
-(BigQuery, Drive, Sheets). A plain `gcloud auth application-default login` is NOT
-enough — mint it with this full scope list:
+A plain `gcloud auth application-default login` is NOT enough — mint ADC with this
+scope list (it covers the Colab CLI's backends AND local runs of steps 00–04;
+BigQuery rides on `cloud-platform`):
 
 ```bash
 gcloud auth application-default login \
   --scopes=openid,\
 https://www.googleapis.com/auth/cloud-platform,\
 https://www.googleapis.com/auth/userinfo.email,\
-https://www.googleapis.com/auth/colaboratory,\
-https://www.googleapis.com/auth/drive,\
-https://www.googleapis.com/auth/spreadsheets
+https://www.googleapis.com/auth/colaboratory
 ```
 
 Why each scope: `userinfo.email` (Colab session backend, else 401), `colaboratory`
 (Colab keep-alive RPC, else 403 and the CLI un-assigns fresh VMs), `openid` +
 `cloud-platform` (gcloud refuses scope lists without them; `cloud-platform` also covers
-BigQuery), `drive` + `spreadsheets` (local runs of step 05's dashboard-sheet upload).
+BigQuery).
+
+Local file outputs need NO Drive scope — they write to the desktop-synced Drive
+folder as plain files.
+
+### Stage 05 locally needs Drive + Sheets scopes (blocked by default)
+
+The one thing the scopes above do NOT cover is a **local** run of step 05 (gspread
+upload to the dashboard spreadsheet). Adding
+`https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/spreadsheets`
+to the login triggers **"This app is blocked"** — Workspace blocks unconfigured apps
+from sensitive scopes (verified 2026-08-05 on ken@donutanalytics.com). Options:
+
+1. **Run stage 05 on Colab instead** (zero setup — `colab auth` on the VM grants
+   Sheets access through Colab's own flow, exactly like the notebook always did).
+   Recommended anyway: 05 is the slowest stage and wants the A100.
+2. **Allow-list gcloud in Workspace admin** (durable fix, ~5 min, needs the
+   donutanalytics.com admin): admin.google.com → Security → Access and data control →
+   API controls → Manage third-party app access → add "Google Cloud SDK" (OAuth
+   client ID `764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com`)
+   as **Trusted**. Then re-run the login above with the two extra scopes appended.
 
 **Verify:**
 

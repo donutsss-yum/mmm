@@ -3,6 +3,21 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (evening) — First machine setup; ADC scope reality check
+
+Ken began first local setup on his MBP. Two field findings folded into docs:
+
+- Google **blocked** the ADC login when it included the `drive` + `spreadsheets`
+  scopes ("This app is blocked" — Workspace restricts sensitive scopes for
+  unconfigured apps). Resolution: the standard login now uses only the 4 Colab/BQ
+  scopes (steps 00–04 need nothing more; local outputs are plain files in the synced
+  Drive folder). Local stage-05 (Sheets upload) options documented in SETUP.md § 3:
+  run 05 on Colab (recommended), or allow-list the gcloud OAuth client in the
+  Workspace admin console.
+- Also: `main` now exists and should be the default branch (repo started empty, so
+  the migration branch was the only/default branch and PR creation failed with
+  "resource not found" — no base branch. Ken chose promote-to-main over a PR).
+
 ## 2026-08-05 (later still) — Adversarial verification pass applied
 
 Ran an 8-auditor verification workflow (cell-by-cell notebook parity, real-CLI flag
