@@ -3,6 +3,35 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (v14 experiment RESULT) — split NOT promoted; v13 stays champion
+
+Ran on Ken's MBP: 3 fits + scorecard in 664 s. Reconciliation gate passed ($0.00
+worst week). Shares: InStore 97.3% / Digital 2.7% (3.2% last-52). All r_hat = 1.0.
+
+**Scorecard** (holdout = last 26 wks, 2025-12-28 → 2026-06-21):
+- Holdout vs actual total: baseline R² −0.44 / MAPE 8.2%; split R² −0.37 / MAPE 8.0%
+  → split wins, but marginally. (Negative R² for BOTH ≠ broken models: the holdout
+  window is low-variance so its mean is a strong competitor, and Meridian's
+  time-varying baseline doesn't extrapolate — an MMM is an attribution machine, not
+  a forecaster. Handicap applies equally; comparison remains fair.)
+- Diagnostic: the DIGITAL model is the only one with positive OOS R² on its own KPI
+  (+0.22) — digital revenue is meaningfully more media-predictable than in-store.
+- **Double-count gate FAILED**: split claims 1.28× the baseline's all-channel
+  incremental. Mild inflation broadly (1.07–1.20), Meta 1.27, and the smoking gun:
+  **Video_Paramount ratio 2.87** — the InStore model gives it $8.4M vs baseline
+  $3.0M (ROAS 16.6x vs 5.8x). Small-spend channel + widened prior (+0.15 sigma)
+  + independent baseline = runaway attribution. The InStore model generally claims
+  MORE than the whole baseline does (e.g. Meta 22.3M vs 17.9M) despite a 97.3% KPI —
+  classic two-independent-baselines double counting.
+
+**Decision (pre-registered rule: win holdout AND pass gates): NOT promoted.**
+v13 remains the production model. Branch kept for iteration. Candidate next steps,
+in preference order: (1) re-run with sub-model sigmas NOT widened (isolate whether
+Paramount's blowup is the widening or structural); (2) if inflation persists, the
+structural fix is the two-"geos"-one-model design (shared baseline kills double
+counting; cost: shared adstock/saturation across streams); (3) park until Digital
+share grows enough to support its own model honestly.
+
 ## 2026-08-05 (v14 experiment built) — exp/v14-revenue-split branch [THIS BRANCH]
 
 Ken applied the extended view to BigQuery. This branch carries the split-model
