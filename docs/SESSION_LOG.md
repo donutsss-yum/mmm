@@ -3,6 +3,34 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (experiments roll-up) — v14 & v15 both tested, both rejected; v13 stays
+
+Two model experiments ran end-to-end today on the local backend (~11 min each),
+each with a pre-registered decision rule, 26-week holdout, and full scorecard.
+Detailed logs live on the experiment branches; this is the mainline summary.
+
+**v14 revenue-split** (`exp/v14-revenue-split`): InStore + Digital(Ecom/App/Vault)
+sub-models summed vs the single model. Won holdout narrowly but FAILED the
+double-counting gate (split claimed 1.28× baseline incremental; Video_Paramount
+blew up 2.87× / 16.6x ROAS). Root cause: two independent baselines + a 97/3 revenue
+split. NOT promoted.
+
+**v15 channel-consolidation** (`exp/v15-channel-consolidation`): Search+PMAX /
+Social / Video_All (Amex dropped), 9 → 3 channels. Attribution parity was excellent
+but holdout was slightly WORSE than baseline, and the consolidated Video posterior
+stayed essentially prior-driven (CI ratio 4.05 vs pure-prior ~3.7). NOT promoted.
+
+**Learnings folded into MODEL.md (robustness section):**
+1. v13's group-level attribution is specification-robust (9ch vs 3ch ratios
+   1.00–1.03) — strong credibility evidence for client use.
+2. Dropping Amex does not leak its ~$2.1M into other channels (returns to
+   baseline) — Amex's measured effect is not confounded.
+3. Channel-level ROAS is prior-driven at EVERY aggregation level tried — the data
+   lacks spend variation to identify it. The path to decision-grade channel ROAS is
+   CALIBRATION (incrementality/holdout tests), not re-specification.
+4. Digital revenue is more media-predictable than in-store (only sub-model with
+   positive OOS R², +0.22) — worth a standalone digital read someday.
+
 ## 2026-08-05 (later still) — View SQL versioned in git + extended with revenue splits
 
 Confirmed the splits are NOT yet in the weekly view (44 cols, only total

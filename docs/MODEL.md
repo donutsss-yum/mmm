@@ -97,6 +97,28 @@ Reading LogNormal ROI priors: median ROAS = `exp(loc)`; mean = `exp(loc + σ²/2
 4. **Video EC50s are prior-driven.** All video `ec_m` posteriors ≈ 1.03 ± 0.46 (the
    prior). Per-partner saturation points are not identified by current data.
 
+## Specification robustness (2026-08-05 experiment findings)
+
+Two alternative specifications were tested against v13 with 26-week holdouts and
+pre-registered gates; both were rejected (details: `exp/v14-revenue-split` and
+`exp/v15-channel-consolidation` branches + SESSION_LOG). What survives as v13 facts:
+
+- **Group-level attribution is specification-robust.** A 3-channel consolidation
+  (Search+PMAX / Meta / all-video) reproduced v13's grouped incremental revenue at
+  ratios 1.00–1.03. The headline numbers do not depend on how finely channels are
+  sliced.
+- **Amex's effect is not confounded.** Removing Amex entirely did not inflate other
+  channels; its ~$2.1M incremental returned to baseline.
+- **Channel ROAS is prior-driven at every aggregation level.** Even one combined
+  Video channel (5 partners' pooled signal) posterior stayed ≈ its prior. The data
+  lacks spend variation to identify channel ROAS from observation alone —
+  **calibration via incrementality tests is the only path to decision-grade channel
+  ROAS**, reinforcing limitation #1 below.
+- **Outcome-splitting fails today's 97/3 revenue mix** (independent baselines
+  double-count: split claimed 1.28× baseline incremental). Revisit around 90/10 —
+  digital's share is growing (2.7% full-window, 3.2% last year) and digital revenue
+  is the more media-predictable stream (only sub-model with positive OOS R²).
+
 ## The analyses
 
 - **Step 02 — HTML results summary**: Meridian's standard two-pager over the report

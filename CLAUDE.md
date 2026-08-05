@@ -152,6 +152,13 @@ cost unmeasured; A100 recommended until measured). All outputs land in Drive at
 
 ## Current status (update me when it changes)
 
+- **2026-08-05 (experiments)**: v14 (revenue-split sub-models) and v15 (channel
+  consolidation) both built, run, and **rejected on pre-registered gates** — v13
+  remains production. Key learnings (attribution is specification-robust; channel
+  ROAS is prior-driven at any aggregation → calibration tests are the real path;
+  digital revenue is the more media-predictable stream) are in `docs/MODEL.md`
+  § Specification robustness. Experiment code preserved on `exp/*` branches.
+
 - **2026-08-05 (night)**: **First end-to-end run succeeded — local backend, 366 s
   total, fit in 226 s (faster than the A100 baseline).** All r_hat = 1.0; posteriors
   and decay profiles reproduce documented v13 behavior; `.binpb` model save works.
