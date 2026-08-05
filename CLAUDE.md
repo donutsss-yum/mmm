@@ -135,6 +135,8 @@ cost unmeasured; A100 recommended until measured). All outputs land in Drive at
   **The view reads a Google-Sheets-backed external table** ("ABC MMM Inputs"), so every
   query needs Drive-scoped credentials — `Permission denied while getting Drive
   credentials` means the ADC scope set is wrong (fix: docs/SETUP.md § 3).
+  Media data (`abc.media`) arrives automatically via **Power My Analytics**, daily —
+  never loaded by hand; freshness check in docs/INGEST.md.
 - 9 paid channels: Meta, Search, PMAX, Amex + 5 video partners (Epsilon, Google, Hulu,
   MNTN, Paramount). **Search uses clicks; all others impressions.**
 - Report window in step 02: `start_date, end_date = '2025-06-29', '2026-06-21'` — must span

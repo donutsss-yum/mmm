@@ -137,9 +137,20 @@ plus fit sanity (r_hat, shape) and links/paths to outputs. One line per anomaly.
 | Jun 2026 | 6/29–6/30/2026 | Applejack skipped; email shift incident + fix; celebs reconciled |
 | — | — | *(migrated to git-native pipeline 2026-08-05; next round starts here)* |
 
-## Open question (ask Ken when relevant)
+## The media side (automatic — no ingest step)
 
-The **media side** (`donut-426.abc.media` — impressions/spend/clicks per platform) is
-NOT covered by this ingest: it arrives by some other path (platform exports?). If a
-refresh shows stale media weeks alongside fresh revenue weeks, that pipeline is why —
-ask Ken how media data lands.
+`donut-426.abc.media` (impressions/spend/clicks per platform) is fed by **Power My
+Analytics**, a connector service that delivers into BigQuery **daily, automatically**
+(confirmed by Ken, 2026-08-05). Nothing to load manually. During a refresh, just
+verify PMA is caught up to the new window before fitting:
+
+```bash
+.venv/bin/python -c "import pandas_gbq; print(pandas_gbq.read_gbq(\"SELECT MAX(time) AS last_media_week FROM abc.mmm WHERE All_spend > 0\", project_id='donut-426'))"
+```
+
+`last_media_week` should be at or past the intended `Model_Dates` end-date. If media
+lags the revenue data, either wait for PMA to catch up or set the window end to the
+last week BOTH sides cover — never fit weeks where revenue exists but media reads as
+zero (the model would read that as "sales without ads" and misattribute to baseline).
+If media looks stale by more than a couple of days, the PMA connector itself is the
+thing to check — that's Ken's side.
