@@ -13,22 +13,38 @@ Bayesian MMM (currently **v13**) that:
 - and (on explicit request only) rebuilds the **scenario planner** tabs in the live
   dashboard spreadsheet that Looker Studio reads.
 
-Development happens **locally in this repo with Claude Code**; execution happens on a
-remote Colab GPU driven by the **`colab` CLI** (`google-colab-cli`). There is no more
-copy-paste into the Colab web UI. The original notebook this was migrated from is
-preserved at `notebooks/MMMv13_2.ipynb` (outputs stripped).
+Development happens **locally in this repo with Claude Code**. Execution has **two
+interchangeable backends** sharing the same `steps/` files (details: `docs/LOCAL.md`):
+
+- **Local (default for dev)**: `scripts/run_local.py` runs stages on the Mac — CPU
+  sampling (slower fit than A100; first-run timing TBD), zero cost, zero session
+  management. Outputs go to the desktop-synced Drive folder.
+- **Colab (GPU escape hatch)**: `scripts/run_pipeline.sh` drives an A100 VM via the
+  **`colab` CLI** (`google-colab-cli`). Use when fit speed matters or for stage 05.
+
+There is no more copy-paste into the Colab web UI. The original notebook is preserved
+at `notebooks/MMMv13_2.ipynb` (outputs stripped).
 
 ## Execution model — the one thing you must internalize
 
-A `colab` **session = a live Jupyter kernel on a rented GPU VM**. `colab exec -s <name> -f <file>`
-sends a local file's code to that kernel. **Kernel state persists across exec calls** —
-`steps/01_fit_model.py` leaves `mmm`, `df_bq`, `credentials`, the channel lists, and `out_dir`
-as kernel globals, and steps 02–05 consume them, exactly like notebook cells sharing a runtime.
-State dies on `colab stop`, `colab restart-kernel`, or VM death (~24h cap) — which is why
-`steps/save_model.py` / `steps/load_model.py` exist (restore a fit in ~2 min instead of re-fitting).
+Stages are notebook cells that live in git: **they share one namespace and later stages
+consume globals set by earlier ones** (`mmm`, `df_bq`, `credentials`, channel lists,
+`out_dir` — set by `01` or `load`).
+
+- On Colab, that namespace is a **live Jupyter kernel on a rented VM**; it persists
+  across separate `colab exec` calls and dies on `colab stop` / `restart-kernel` /
+  VM death (~24h cap).
+- Locally, it's **one `run_local.py` process**; it dies when the process exits, so
+  chain stages in a single invocation.
+
+Either way, `steps/save_model.py` / `steps/load_model.py` bridge the gaps (restore a
+fit in ~2 min instead of re-fitting). Saves are cross-backend — both environments
+read/write the same Drive `model_saves/` folder.
 
 ## Golden rules for agents
 
+0. **Prefer the local backend for development runs** unless Ken asks for Colab or the
+   task needs the A100 (fast fit, stage 05). Rules 1–5 below are Colab-specific.
 1. **Never run interactive commands**: `colab auth`, `colab drivemount`, `colab repl`,
    `colab console` need a human TTY and will hang you. If auth/mount is missing, tell Ken
    to run `colab auth -s mmm` and `colab drivemount -s mmm` in his own terminal.
@@ -53,19 +69,25 @@ State dies on `colab stop`, `colab restart-kernel`, or VM death (~24h cap) — w
 ## Standard workflow
 
 ```bash
-# One-time machine setup (human): see docs/SETUP.md  (CLI install + gcloud ADC scopes)
+# One-time machine setup (human): docs/SETUP.md (auth) + ./scripts/setup_local.sh (local env)
 
+# --- LOCAL (default for development) ---
+.venv/bin/python scripts/run_local.py               # default: 00 01 save 02 03 04
+.venv/bin/python scripts/run_local.py load 03 04    # saved fit + re-run analyses
+.venv/bin/python scripts/run_local.py 05            # scenario planner (explicit only)
+
+# --- COLAB (GPU: fast fit, stage 05) ---
 ./scripts/provision.sh            # colab new (A100) + colab install; if run non-interactively,
                                   # prints the two human-only auth/mount commands
 ./scripts/run_pipeline.sh         # default: 00 01 save 02 03 04  (fit + all analyses, NOT 05)
 ./scripts/run_pipeline.sh 05      # scenario planner -> live dashboard sheet (explicit only)
 ./scripts/teardown.sh             # stop the VM (billing!)
 
-# Iterating on one analysis while the fit sits in the kernel:
+# Iterating on one analysis while the fit sits in the kernel (Colab):
 #   edit steps/03_roas_quarterly.py, then
 ./scripts/run_pipeline.sh 03
 
-# Fresh session, yesterday's fit:
+# Fresh Colab session, yesterday's fit:
 ./scripts/run_pipeline.sh 00 load 03 04
 ```
 
@@ -86,8 +108,10 @@ Useful direct commands: `colab sessions` (what's running/billing), `colab status
 | 04 | `steps/04_decay_profiles.py` | Per-channel adstock decay profiles → CSVs + PNG | minutes |
 | 05 | `steps/05_scenario_planner.py` | Scenario planner → **live dashboard sheet** | ~1.5 h |
 
-All outputs land in Drive at `My Drive/ABC/MMM/` (`out_dir = /content/drive/MyDrive/ABC/MMM`
-on the VM). Naming conventions in `docs/MODEL.md`.
+Runtimes are A100 numbers; local CPU runs are slower (multiplier unknown until first
+run — record it in `docs/SESSION_LOG.md`). All outputs land in Drive at
+`My Drive/ABC/MMM/` — via the mount on Colab, via the desktop-synced folder locally
+(override with `MMM_OUT_DIR`). Naming conventions in `docs/MODEL.md`.
 
 ## Key facts
 
@@ -105,7 +129,8 @@ on the VM). Naming conventions in `docs/MODEL.md`.
 ## Where deeper docs live
 
 - `docs/SETUP.md` — one-time machine setup: CLI install, gcloud ADC scopes, first session.
-- `docs/WORKFLOW.md` — full session lifecycle, recovery playbook, cost notes.
+- `docs/LOCAL.md` — the local backend: setup, usage, local-vs-Colab tradeoffs, Metal note.
+- `docs/WORKFLOW.md` — full (Colab) session lifecycle, recovery playbook, cost notes.
 - `docs/MODEL.md` — model card: priors + rationale, spec choices, methodology of each
   analysis, known limitations, output naming.
 - `docs/CHANGELOG.md` — model version history (v12 → v13 …).
@@ -113,9 +138,15 @@ on the VM). Naming conventions in `docs/MODEL.md`.
 
 ## Current status (update me when it changes)
 
+- **2026-08-05 (later)**: Added the LOCAL execution backend at Ken's request
+  (`scripts/run_local.py` + `setup_local.sh` + `docs/LOCAL.md`); steps are now
+  environment-aware (out_dir resolution, CPU-fit gate via `MMM_ALLOW_CPU`, per-env
+  remediation messages). Local is now the default dev path; Colab remains for GPU
+  speed / stage 05.
 - **2026-08-05**: Repo created by migrating `MMMv13_2.ipynb` (Colab web UI) to this
   CLI-driven structure. Code is semantically 1:1 with the notebook (see MIGRATION NOTE
-  headers in each step). **Not yet executed end-to-end via the CLI** — first real run
-  pending Ken's one-time setup (docs/SETUP.md) and session auth. Expect first-run
-  wrinkles in step 02 chart saving (Altair `.save()`) and ADC scope coverage for
-  gspread in step 05; both have fallbacks/clear errors.
+  headers in each step). **Not yet executed end-to-end in either backend** — first
+  real run pending Ken's one-time setup (docs/SETUP.md; for local also
+  `./scripts/setup_local.sh`). Expect first-run wrinkles in step 02 chart saving
+  (Altair `.save()`), ADC scope coverage for gspread in step 05, and unknown local
+  CPU fit time; all have fallbacks/clear errors.

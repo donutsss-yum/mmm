@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.venv/
 
 # Notebook execution artifacts (colab exec -f x.ipynb writes x_output.ipynb)
 *_output.ipynb

@@ -51,12 +51,21 @@
 # for prior calibration on roi_m[Video_Google].
 # =============================================================================
 
-ALLOW_CPU = False  # set True only if you knowingly want a (very slow) CPU fit
-
-# 1) Credentials - Application Default Credentials, set up on the VM by `colab auth`.
-#    The `credentials` global is consumed later by step 05 (gspread upload to the dashboard sheet).
+# --- Environment detection: same file runs on a Colab VM (via colab exec) or locally
+# --- on the Mac (via scripts/run_local.py). See docs/LOCAL.md.
 import datetime
+import os
 
+IS_COLAB = os.path.isdir('/content')
+
+# CPU fits are allowed only when explicitly requested (scripts/run_local.py sets this -
+# there's no CUDA GPU on a Mac and a CPU fit is the whole point of local mode).
+ALLOW_CPU = os.environ.get('MMM_ALLOW_CPU', '0') == '1'
+
+# 1) Credentials - Application Default Credentials.
+#    Colab VM: set up by `colab auth` (interactive, once per session).
+#    Local Mac: set up by `gcloud auth application-default login --scopes=...` (docs/SETUP.md).
+#    The `credentials` global is consumed later by step 05 (gspread upload to the dashboard sheet).
 try:
     import google.auth
     credentials, _adc_project = google.auth.default(scopes=[
@@ -65,20 +74,30 @@ try:
         'https://www.googleapis.com/auth/spreadsheets',
     ])
 except Exception as _e:
+    _fix = ("From your LOCAL terminal run `colab auth -s <session>` (interactive - human required)"
+            if IS_COLAB else
+            "Run the `gcloud auth application-default login --scopes=...` command from docs/SETUP.md")
     raise RuntimeError(
-        "No Google credentials on the VM. From your LOCAL terminal run "
-        "`colab auth -s <session>` (interactive - human required), then re-run this step. "
+        f"No Google credentials available. {_fix}, then re-run this step. "
         f"Underlying error: {type(_e).__name__}: {_e}"
     )
 
-# Drive must be mounted for outputs (steps 02-05 write to Drive). Warn here, hard-checked in step 00.
-import os
-if not os.path.isdir('/content/drive/MyDrive'):
+# Output folder for ALL pipeline exports (HTML summaries, CSVs, model saves, diagnostics).
+# Resolution order:
+#   1. MMM_OUT_DIR env var (explicit override)
+#   2. Colab: the Drive mount path (requires `colab drivemount`)
+#   3. Local Mac: the desktop-synced Google Drive folder (writes sync to the cloud automatically)
+_LOCAL_DRIVE_DIR = os.path.expanduser(
+    '~/Library/CloudStorage/GoogleDrive-ken@donutanalytics.com/My Drive/ABC/MMM')
+out_dir = os.environ.get('MMM_OUT_DIR') or (
+    '/content/drive/MyDrive/ABC/MMM' if IS_COLAB else _LOCAL_DRIVE_DIR)
+
+if IS_COLAB and not os.path.isdir('/content/drive/MyDrive'):
     print("WARNING: Google Drive is NOT mounted. Steps 02-05 will fail to write outputs. "
           "From your LOCAL terminal run `colab drivemount -s <session>` (interactive).")
-
-# Drive output folder for ALL pipeline exports (HTML summaries, CSVs, model saves, diagnostics).
-out_dir = '/content/drive/MyDrive/ABC/MMM'
+elif not IS_COLAB and not os.path.isdir(out_dir):
+    print(f"WARNING: output folder does not exist: {out_dir}. Steps 02-05 will fail to write "
+          f"outputs. Check the Google Drive desktop sync, or set MMM_OUT_DIR.")
 
 # 3) Imports
 import arviz as az
@@ -102,9 +121,14 @@ print("GPU Available:", _gpu_available)
 print("TensorFlow version:", tf.__version__)
 if not _gpu_available and not ALLOW_CPU:
     raise RuntimeError(
-        "No GPU on this runtime and ALLOW_CPU is False. Fitting on CPU takes hours. "
-        "Provision with: colab stop -s <session>; colab new -s <session> --gpu A100"
+        "No GPU on this runtime and MMM_ALLOW_CPU is not set. Fitting on CPU is much slower "
+        "than the ~8 min A100 baseline. On Colab: colab stop -s <session>; "
+        "colab new -s <session> --gpu A100. Locally: scripts/run_local.py sets "
+        "MMM_ALLOW_CPU=1 for you (a CPU fit is expected there)."
     )
+if not _gpu_available and ALLOW_CPU:
+    print("NOTE: fitting on CPU (local mode). Expect the sampling step to take well over the "
+          "~8 min A100 baseline - let it run.")
 
 # 5) Pull data from BigQuery. abc.mmm is the weekly blender view (media + promos + controls);
 #    'In Model' filter excludes weeks we don't want to fit (burn-in, hold-outs).

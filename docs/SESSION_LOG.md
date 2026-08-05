@@ -3,6 +3,30 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (later) — Local execution backend added
+
+Ken: "not even sure we need Colab — my MBP has a shit ton of RAM — set up the code to
+run locally." Done, as a SECOND backend rather than a replacement (RAM was never the
+constraint for this small national model; sampler speed is, and the A100 stays useful
+for the ~1.5 h scenario planner):
+
+- `scripts/run_local.py` — runs stages in ONE shared Python namespace (the local twin
+  of the Colab kernel). Sets `MMM_ALLOW_CPU=1`; `--out-dir` / `--require-gpu` flags.
+- `scripts/setup_local.sh` + `requirements-local.txt` — `.venv` (Python 3.12 via uv),
+  Meridian **without** the CUDA extra (TF CPU wheel; no NVIDIA GPU on a Mac).
+- Steps made environment-aware: `out_dir` resolves env-var → Colab mount → desktop-
+  synced Drive folder (`~/Library/CloudStorage/GoogleDrive-ken@donutanalytics.com/My
+  Drive/ABC/MMM`); auth-failure remediation messages differ per environment; step 00
+  treats missing GPU as WARN locally / FAIL on Colab.
+- SETUP.md § 3 now mints ADC with the union scope set (colab + drive + spreadsheets)
+  so one login serves both backends. docs/LOCAL.md added (tradeoffs, first-run watch
+  list, tensorflow-metal caveat).
+
+Open question for first local run: **wall-clock of the CPU fit** (record it here).
+If it's tolerable, local becomes the everyday path and Colab is reserved for stage 05
+and deadline days. tensorflow-metal deliberately NOT installed (TFP-on-Metal is
+unreliable for MCMC; try only against a verified CPU baseline).
+
 ## 2026-08-05 — Migration: Colab web UI → git + Colab CLI (Claude Code session)
 
 **Done:**

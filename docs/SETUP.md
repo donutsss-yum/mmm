@@ -1,7 +1,9 @@
 # One-time setup (per machine)
 
 Everything here happens **once per computer** (e.g. Ken's Mac). Day-to-day operation is
-in [WORKFLOW.md](WORKFLOW.md).
+in [WORKFLOW.md](WORKFLOW.md). For **local (no-Colab) execution**, do § 2–3 below plus
+`./scripts/setup_local.sh` — details in [LOCAL.md](LOCAL.md); § 0–1 and 4 are only
+needed for the Colab path.
 
 ## 0. Prerequisites
 
@@ -32,22 +34,26 @@ brew install google-cloud-sdk        # macOS
 # or https://cloud.google.com/sdk/docs/install
 ```
 
-## 3. Authenticate the CLI (Application Default Credentials)
+## 3. Authenticate with Google (Application Default Credentials)
 
-The CLI talks to Colab's backends with ADC. It needs **exactly these four scopes** —
-a plain `gcloud auth application-default login` is NOT enough:
+One ADC login serves everything: the Colab CLI's backends AND local pipeline runs
+(BigQuery, Drive, Sheets). A plain `gcloud auth application-default login` is NOT
+enough — mint it with this full scope list:
 
 ```bash
 gcloud auth application-default login \
   --scopes=openid,\
 https://www.googleapis.com/auth/cloud-platform,\
 https://www.googleapis.com/auth/userinfo.email,\
-https://www.googleapis.com/auth/colaboratory
+https://www.googleapis.com/auth/colaboratory,\
+https://www.googleapis.com/auth/drive,\
+https://www.googleapis.com/auth/spreadsheets
 ```
 
-Why each scope: `userinfo.email` (session backend, else 401), `colaboratory`
-(keep-alive RPC, else 403 and the CLI un-assigns fresh VMs), `openid` + `cloud-platform`
-(gcloud refuses scope lists without them).
+Why each scope: `userinfo.email` (Colab session backend, else 401), `colaboratory`
+(Colab keep-alive RPC, else 403 and the CLI un-assigns fresh VMs), `openid` +
+`cloud-platform` (gcloud refuses scope lists without them; `cloud-platform` also covers
+BigQuery), `drive` + `spreadsheets` (local runs of step 05's dashboard-sheet upload).
 
 **Verify:**
 

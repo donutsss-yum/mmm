@@ -1,7 +1,8 @@
-# Day-to-day workflow
+# Day-to-day workflow (Colab backend)
 
 One-time machine setup is in [SETUP.md](SETUP.md). This page is the operating manual for
-a working session. The stage table (files, runtimes, timeouts) lives in `CLAUDE.md`.
+a **Colab** working session; for the local backend (no VM, no billing, CPU fit) see
+[LOCAL.md](LOCAL.md). The stage table (files, runtimes, timeouts) lives in `CLAUDE.md`.
 
 ## Mental model
 

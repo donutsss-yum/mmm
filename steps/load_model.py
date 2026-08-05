@@ -27,7 +27,9 @@ LOAD_PATH = None  # set to an explicit .pkl path to load a specific save; None =
 import glob
 import os
 
-# --- 1) credentials (same as step 01) ----------------------------------------
+# --- 1) credentials + output dir (same environment logic as step 01) ---------
+IS_COLAB = os.path.isdir('/content')
+
 try:
     import google.auth
     credentials, _adc_project = google.auth.default(scopes=[
@@ -36,20 +38,31 @@ try:
         'https://www.googleapis.com/auth/spreadsheets',
     ])
 except Exception as _e:
+    _fix = ("From your LOCAL terminal run `colab auth -s <session>` (interactive - human required)"
+            if IS_COLAB else
+            "Run the `gcloud auth application-default login --scopes=...` command from docs/SETUP.md")
     raise RuntimeError(
-        "No Google credentials on the VM. From your LOCAL terminal run "
-        "`colab auth -s <session>` (interactive - human required), then re-run this step. "
+        f"No Google credentials available. {_fix}, then re-run this step. "
         f"Underlying error: {type(_e).__name__}: {_e}"
     )
 
 import pandas as pd
 import pandas_gbq
 
-out_dir = '/content/drive/MyDrive/ABC/MMM'
-if not os.path.isdir('/content/drive/MyDrive'):
+_LOCAL_DRIVE_DIR = os.path.expanduser(
+    '~/Library/CloudStorage/GoogleDrive-ken@donutanalytics.com/My Drive/ABC/MMM')
+out_dir = os.environ.get('MMM_OUT_DIR') or (
+    '/content/drive/MyDrive/ABC/MMM' if IS_COLAB else _LOCAL_DRIVE_DIR)
+
+if IS_COLAB and not os.path.isdir('/content/drive/MyDrive'):
     raise RuntimeError(
         "Google Drive is not mounted, so there is nothing to load from. "
         "From your LOCAL terminal run `colab drivemount -s <session>` (interactive)."
+    )
+if not os.path.isdir(out_dir):
+    raise RuntimeError(
+        f"Output folder not found: {out_dir} - nothing to load from. "
+        f"Check the Drive mount/desktop sync, or set MMM_OUT_DIR."
     )
 
 # --- 2) data pull + definitions (MUST mirror steps/01_fit_model.py) ----------

@@ -1,0 +1,15 @@
+# Dependencies for LOCAL (Mac) execution - installed into .venv via:
+#   ./scripts/setup_local.sh
+#
+# Differences vs requirements-colab.txt:
+#   - no `and-cuda` extra: there's no NVIDIA GPU on a Mac; TensorFlow's standard
+#     wheel runs on CPU (Apple silicon arm64 wheels exist for TF >= 2.13).
+#   - no `colab` extra: those are Colab-environment pins.
+#
+# Optional experiment (NOT installed by default): `tensorflow-metal` enables the
+# Apple-GPU plugin, but TFP's MCMC has a history of op-coverage problems on
+# Metal - try it only after a clean CPU baseline run, and verify results match.
+google-meridian[scenarioplanner]
+
+pandas-gbq   # BigQuery pull in steps 01 / load_model
+gspread      # dashboard sheet upload fallback in step 05
