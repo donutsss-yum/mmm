@@ -3,6 +3,30 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (v15 experiment RESULT) — consolidation NOT promoted; v13 stays champion
+
+Ran on Ken's MBP: 2 fits + scorecard in 387 s. Both models r_hat = 1.0.
+
+- **Holdout**: baseline R² −0.4418 / wMAPE 8.02% vs consolidated −0.5185 / 8.24% —
+  baseline wins, narrowly (mirror image of v14's narrow split win; both experiments'
+  accuracy deltas are within noise of each other).
+- **Attribution parity — the headline finding**: group-level incremental is nearly
+  IDENTICAL across specs (Search+PMAX ratio 1.03, Social 1.00, Video 1.00; total
+  excl-Amex 1.01). And Amex's $2.1M did NOT leak into surviving channels when
+  dropped — it returned to baseline. Two implications: (a) v13's group-level
+  attribution is robust to channel-structure changes — strong credibility evidence;
+  (b) Amex's measured effect isn't confounded with other channels.
+- **Posterior width — the sobering finding**: Video_All CI ratio 4.05 vs a
+  pure-prior ratio of ~3.7 at sigma 0.40 — i.e. the consolidated video posterior is
+  STILL essentially prior-driven. Same for Search_PMAX (3.34 vs prior ~3.2).
+  Consolidation does not unlock data-identification of channel ROAS; the data lacks
+  the spend variation regardless of aggregation level. The only real fix remains
+  CALIBRATION (incrementality tests), reinforcing MODEL.md's existing
+  recommendation re: Google video.
+
+**Decision: NOT promoted (pre-registered rule: holdout ≥ baseline — it wasn't).**
+v13 (9 channels, Amex included) remains production. Branch preserved.
+
 ## 2026-08-05 (v15 experiment built) — exp/v15-channel-consolidation [THIS BRANCH]
 
 Ken's idea after v14's post-mortem: consolidate channels — **Search+PMAX, Social
