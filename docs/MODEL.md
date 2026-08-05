@@ -52,7 +52,10 @@ Reading LogNormal ROI priors: median ROAS = `exp(loc)`; mean = `exp(loc + σ²/2
 
 ## Model spec & sampling
 
-- `media_effects_dist='log_normal'` — effects strictly positive, matches ROI prior.
+- `media_effects_dist='log_normal'` — **inert for this model**: Meridian resets it to
+  `'normal'` in nationally aggregated models (UserWarning observed on the first local
+  run, meridian 1.7.1; equally true of the Colab runs). Kept in the spec for fidelity
+  to the notebook and in case the model ever goes geo-level.
 - `max_lag=12` weeks — long enough for video tails, short enough to avoid spurious
   late-season fits.
 - `hill_before_adstock=True` — saturation per-week, then adstock convolution. Makes the

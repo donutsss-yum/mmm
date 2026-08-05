@@ -13,3 +13,4 @@ google-meridian[scenarioplanner]
 
 pandas-gbq   # BigQuery pull in steps 01 / load_model
 gspread      # dashboard sheet upload fallback in step 05
+tqdm         # silences BigQuery's missing-progress-bar warning (cosmetic)

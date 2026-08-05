@@ -7,17 +7,19 @@ The pipeline has **two interchangeable execution backends** sharing the exact sa
 |---|---|---|
 | Runner | `scripts/run_local.py` (one Python process = the "kernel") | `scripts/run_pipeline.sh` (`colab exec` into a VM kernel) |
 | Hardware | CPU (TFP/MCMC can't reliably use Apple's Metal GPU) | A100 GPU |
-| Fit time (step 01) | **Unknown until first run** — expect well over the A100's ~8 min (plausibly 30 min–a few hours) | ~8 min |
-| Scenario planner (05) | Likely very slow (~1.5 h on A100) — prefer Colab or run overnight | ~1.5 h |
+| Fit time (step 01) | **~226 s measured** (MBP, 2026-08-05 — beats the A100 baseline; this national model is small and XLA-on-CPU parallelizes 20 chains fine) | ~8 min |
+| Scenario planner (05) | Unmeasured — could be hours; use Colab until someone measures it | ~1.5 h |
 | Cost | Free | Compute units while VM is up |
 | Session management | None — no billing, no auth-per-session, no teardown | provision/auth/mount/stop dance |
 | Outputs | Desktop-synced Drive folder (`~/Library/CloudStorage/GoogleDrive-ken@donutanalytics.com/My Drive/ABC/MMM`) — syncs to the same cloud folder | Drive mount (`/content/drive/MyDrive/ABC/MMM`) |
 
-**Practical guidance:** develop and iterate locally (it's free and frictionless); jump
-to Colab when you need the fit fast or for the scenario planner. Model saves are
-interchangeable — a fit saved on Colab can be `load`-ed locally and vice versa, since
-both write `model_saves/` to the same Drive folder. RAM is not a constraint either way:
-this is a small national-level model (~174 weeks); it's sampler *speed* that differs.
+**Practical guidance (updated after first measured run):** local is the default for
+everything — the full 00–04 pipeline takes ~6 minutes on the MBP, with the fit itself
+*faster* than the A100 baseline. Colab's remaining role is stage 05 (unmeasured
+locally, ~1.5 h on A100) and nothing else. Model saves are interchangeable — a fit
+saved on Colab can be `load`-ed locally and vice versa, since both write
+`model_saves/` to the same Drive folder. RAM was never a constraint: this is a small
+national-level model (~182 weeks in-model as of 2026-08).
 
 ## One-time setup
 

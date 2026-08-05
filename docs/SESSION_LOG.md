@@ -3,6 +3,39 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (night) — FIRST END-TO-END RUN: local backend, full success
+
+`caffeinate -i .venv/bin/python scripts/run_local.py` on Ken's MBP (Apple silicon,
+CPU-only, TF 2.20 + XLA, google-meridian 1.7.1). **Total pipeline: 366 s.**
+
+| Stage | Wall clock | Notes |
+|---|---|---|
+| 00 preflight | 5 s (59 s cold) | cold run pays TF import |
+| 01 fit | **226 s** | **beats the ~8 min A100 baseline** — national model is small; XLA CPU + 20 chains parallelize fine. Data shape (182, 44). |
+| save | 1 s | 70 MB `.binpb` via new serde path — worked first try |
+| 02 diagnostics + HTML | 110 s | all charts saved (Altair HTML + PNG); no chart-save wrinkles |
+| 03 ROAS quarterly | 17 s | CSV exported |
+| 04 decay profiles | 7 s | CSVs + PNG exported |
+
+**Fit quality:** every `r_hat` = 1.0 (roi_m, beta_m, beta_gm, ec_m). Posteriors match
+v13's documented behavior: Search 4.1x, Meta 4.9x, MNTN 6.4x / Paramount 6.2x (above
+prior, consistent with realized history), Google 5.9x ≈ prior (documented
+can't-move-it case), all ec_m ≈ 1.0. Decay fingerprint reproduced: ~51–53% wk-0 for
+geometric channels, ~14% wk-0 / half-life 4 wk for video.
+
+**Consequence:** local is now the default backend for EVERYTHING except stage 05
+(cost locally still unmeasured). Colab's remaining role: stage 05 (if slow locally)
+and nothing else, pending that measurement.
+
+**Observations for future maintenance:**
+- Meridian warns `media_effects_dist will be reset to 'normal'` — national models
+  ignore the spec's `log_normal`; setting is inert (true on Colab too). MODEL.md updated.
+- `Analyzer(mmm)` DeprecationWarning: `meridian` arg → `model_context` in a future
+  Meridian; steps 03/04 will need a one-line change eventually.
+- Benign/cosmetic: population ignored (national), revenue_per_kpi ignored,
+  eta/xi/tau params forced Deterministic(0) (national), arviz "trace group" warnings,
+  tqdm missing (added to requirements-local.txt for fresh setups).
+
 ## 2026-08-05 (evening) — First machine setup; ADC scope reality, in two acts
 
 Ken began first local setup on his MBP. Field findings folded into docs:

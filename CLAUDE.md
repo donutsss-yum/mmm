@@ -106,10 +106,12 @@ Useful direct commands: `colab sessions` (what's running/billing), `colab status
 | 02 | `steps/02_diagnostics.py` | Convergence diagnostics + **HTML results summary** | ~3 min |
 | 03 | `steps/03_roas_quarterly.py` | Spend-aligned ROAS by quarter + non-media attribution → CSV | minutes |
 | 04 | `steps/04_decay_profiles.py` | Per-channel adstock decay profiles → CSVs + PNG | minutes |
-| 05 | `steps/05_scenario_planner.py` | Scenario planner → **live dashboard sheet** | ~1.5 h |
+| 05 | `steps/05_scenario_planner.py` | Scenario planner → **live dashboard sheet** | ~1.5 h (A100); local TBD |
 
-Runtimes are A100 numbers; local CPU runs are slower (multiplier unknown until first
-run — record it in `docs/SESSION_LOG.md`). All outputs land in Drive at
+Measured local timings (MBP, CPU, 2026-08-05 first run): 00 ≈ 5 s warm, **01 ≈ 226 s
+(beats the ~8 min A100 baseline)**, save ≈ 1 s, 02 ≈ 110 s, 03 ≈ 17 s, 04 ≈ 7 s —
+total ≈ 6 min. **Local is the default backend for everything except stage 05** (local
+cost unmeasured; A100 recommended until measured). All outputs land in Drive at
 `My Drive/ABC/MMM/` — via the mount on Colab, via the desktop-synced folder locally
 (override with `MMM_OUT_DIR`). Naming conventions in `docs/MODEL.md`.
 
@@ -140,6 +142,12 @@ run — record it in `docs/SESSION_LOG.md`). All outputs land in Drive at
 - `docs/SESSION_LOG.md` — dated log of what was done/decided each working session.
 
 ## Current status (update me when it changes)
+
+- **2026-08-05 (night)**: **First end-to-end run succeeded — local backend, 366 s
+  total, fit in 226 s (faster than the A100 baseline).** All r_hat = 1.0; posteriors
+  and decay profiles reproduce documented v13 behavior; `.binpb` model save works.
+  Local is now the proven default for stages 00–04; stage 05 local cost still
+  unmeasured. Details in `docs/SESSION_LOG.md`.
 
 - **2026-08-05 (later)**: Added the LOCAL execution backend at Ken's request
   (`scripts/run_local.py` + `setup_local.sh` + `docs/LOCAL.md`); steps are now
