@@ -3,6 +3,28 @@
 Newest first. One entry per meaningful working session: what was done, what was
 decided, what's pending. Keep `CLAUDE.md`'s "Current status" in sync.
 
+## 2026-08-05 (July ingest finished) — live append verified CLEAN; window roll deferred
+
+Picked up the July round at the "run LIVE" step (dry run approved earlier today in the
+cloud session). A fresh dry run proposed **0 rows on all 8 tabs** — the approved append
+had already been applied to the sheet between approval and this session (bookkeeping
+was never pushed; presumably the cloud session ran live and stopped). Ran the script
+live anyway: appends no-op'd, verification pass ran → **CLEAN**.
+
+- Tab tails match the approved plan exactly: storecount/rev_store → 8/1, lightning
+  → 8/3, rev_app → 8/2, rev_vault → 7/31, rev_ecom → 7/6 (the flagged stall);
+  celebs reconcile clean (111 rows, none missing, no tab-only warnings).
+- Provenance spot-checks: rev_vault 6/30 repair holds $258,419 (the "$258k!" from
+  the dry run), rev_ecom 6/30 repaired ($32,977 / 238 / 1,588), and
+  control_lightning row 1312 carries the script's LS_Days IFS formula — the append
+  was the script's work, matching the approved plan, not a hand-paste.
+- Committed: input folder `inputs/reupdateddatathrough81/` (incl. the skipped
+  Applejack + Vault Day files, for the record), the `verify()` exemption for Ken's
+  hand-added `Total` rows in the ingest script, and doc updates.
+- **Refresh intentionally stops here** (see INGEST.md History flags): rev_ecom
+  source blank after 7/6 (export lag?) so `Model_Dates` (still 2026-06-27) must not
+  roll past 7/6; `Vault Day.xlsx` ruling and Google Trends refresh pending Ken.
+
 ## 2026-08-05 (ingest integrated) — monthly refresh is now a first-class pipeline
 
 Ken imported his three pre-git Claude workspaces into `legacy/` (abc-mmm = the
