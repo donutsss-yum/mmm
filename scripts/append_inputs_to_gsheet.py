@@ -347,7 +347,8 @@ def verify(sh):
                 'rev_store', 'rev_ecom', 'rev_app', 'rev_vault']:
         ws = sh.worksheet(tab)
         vals = [r for r in ws.get_all_values() if any(c.strip() for c in r)]
-        bad = [r[0] for r in vals[1:] if r[0].strip() and not any(ch in r[0] for ch in '/-')]
+        bad = [r[0] for r in vals[1:] if r[0].strip() and r[0].strip() != 'Total'
+               and not any(ch in r[0] for ch in '/-')]
         if bad:
             print(f'  {tab}: {len(bad)} col-A values not date-like (raw serials?): {bad[:3]}')
             problems += 1

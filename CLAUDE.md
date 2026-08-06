@@ -161,6 +161,12 @@ cost unmeasured; A100 recommended until measured). All outputs land in Drive at
 
 ## Current status (update me when it changes)
 
+- **2026-08-05 (July ingest)**: July data is **in the live sheet and verified
+  CLEAN** (storecount/rev_store → 8/1, lightning → 8/3, rev_app → 8/2, vault →
+  7/31, ecom → 7/6). Refresh stopped after ingest — window NOT rolled: rev_ecom
+  export stalls at 7/6, `Vault Day.xlsx` ruling and Google Trends refresh pending
+  Ken. Details + flags in `docs/INGEST.md` History.
+
 - **2026-08-05 (experiments)**: v14 (revenue-split sub-models) and v15 (channel
   consolidation) both built, run, and **rejected on pre-registered gates** — v13
   remains production. Key learnings (attribution is specification-robust; channel
